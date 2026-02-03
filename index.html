@@ -48,14 +48,14 @@ button{background:#667eea;color:#fff;border:none;font-weight:700}
 <a class="link" href="https://youtube.com/@ftharshitbhai16" target="_blank" onclick="countClick(1)">FT Harshit Bhai</a>
 <a class="link" href="https://youtube.com/@ytytking697" target="_blank" onclick="countClick(2)">YTYT King</a>
 <a class="link" href="https://youtube.com/@dailyshortshub07" target="_blank" onclick="countClick(3)">Daily Shorts Hub</a>
-<button onclick="checkNext()">Next</button>
+<button type="button" onclick="checkNext()">Next</button>
 <p id="taskMsg" style="color:red;text-align:center"></p>
 </div>
 
 <!-- UPLOAD -->
 <div id="uploadPage" class="card">
 <h2>Upload 4 Screenshots</h2>
-<input type="file" id="fileInput" accept="image/*">
+<input type="file" id="fileInput" accept="image/*" multiple>
 <div class="preview" id="preview"></div>
 <p id="countText">Uploaded: 0 / 4</p>
 </div>
@@ -108,21 +108,17 @@ function checkNext(){
  taskPage.style.display="none";uploadPage.style.display="block";
 }
 
-  fileInput.onchange = e => {
-  let files = Array.from(e.target.files);
-
-  files.forEach(file => {
-    if (!file.type.startsWith("image/")) return;
-    if (uploads.length >= MAX) return;
-
-    let reader = new FileReader();
-    reader.onload = () => {
-      uploads.push(reader.result);
-      preview.innerHTML += `<img src="${reader.result}">`;
-      updateCount();
-    };
-    reader.readAsDataURL(file);
-  });
+// MULTIPLE IMAGE UPLOAD
+fileInput.onchange=e=>{
+ let files=Array.from(e.target.files);
+ files.forEach(file=>{
+  if(!file.type.startsWith("image/")) return;
+  if(uploads.length>=MAX) return;
+  let r=new FileReader();
+  r.onload=()=>{uploads.push(r.result);preview.innerHTML+=`<img src="${r.result}">`;updateCount();}
+  r.readAsDataURL(file);
+ });
+};
 
 function updateCount(){
  countText.innerText=`Uploaded: ${uploads.length} / 4`;
