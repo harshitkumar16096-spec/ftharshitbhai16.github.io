@@ -23,7 +23,7 @@ button{background:#667eea;color:#fff;border:none;font-weight:700}
 </head>
 <body>
 
-<!-- REGISTER FORM -->
+<!-- REGISTER -->
 <form id="registerForm" class="card" style="display:block">
 <h2>Welcome, Ft Harshit Bhai Giveaway</h2>
 <input id="ruser" placeholder="Username" required>
@@ -32,7 +32,7 @@ button{background:#667eea;color:#fff;border:none;font-weight:700}
 <p onclick="showLogin()" style="text-align:center;color:blue;cursor:pointer">Already have account? Login</p>
 </form>
 
-<!-- LOGIN FORM -->
+<!-- LOGIN -->
 <form id="loginForm" class="card">
 <h2>Login</h2>
 <input id="luser" placeholder="Username" required>
@@ -41,7 +41,7 @@ button{background:#667eea;color:#fff;border:none;font-weight:700}
 <p onclick="showRegister()" style="text-align:center;color:blue;cursor:pointer">Create account</p>
 </form>
 
-<!-- TASK PAGE -->
+<!-- TASK -->
 <div id="taskPage" class="card">
 <h2 id="welcomeText"></h2>
 <p>Subscribe all 3 channels</p>
@@ -52,7 +52,7 @@ button{background:#667eea;color:#fff;border:none;font-weight:700}
 <p id="taskMsg" style="color:red;text-align:center"></p>
 </div>
 
-<!-- UPLOAD PAGE -->
+<!-- UPLOAD -->
 <div id="uploadPage" class="card">
 <h2>Upload 4 Screenshots</h2>
 <input type="file" id="fileInput" accept="image/*">
@@ -60,13 +60,12 @@ button{background:#667eea;color:#fff;border:none;font-weight:700}
 <p id="countText">Uploaded: 0 / 4</p>
 </div>
 
-<!-- FINAL PAGE -->
+<!-- FINAL -->
 <div id="finalPage" class="card">
 <h2>Wait For Result ⏳</h2>
 <h2>CONGRATULATIONS 🎉</h2>
 <p id="finalMsg"></p>
 <p>Thanks For Participating In Giveaway</p>
-
 <div class="timer">
   <div class="time-box"><span id="days">0</span>DAYS</div>
   <div class="time-box"><span id="hours">0</span>HOURS</div>
@@ -78,6 +77,80 @@ button{background:#667eea;color:#fff;border:none;font-weight:700}
 <script>
 let clicked={1:false,2:false,3:false},count=0,uploads=[],MAX=4;
 
+// REGISTER
 registerForm.onsubmit=e=>{
  e.preventDefault();
- localStorage.setItem("user",JSON.stringify({u:ruser.value,p
+ localStorage.setItem("user",JSON.stringify({u:ruser.value.trim(),p:rpass.value.trim()}));
+ alert("Registered! Now login.");
+ showLogin();
+};
+
+// LOGIN
+loginForm.onsubmit=e=>{
+ e.preventDefault();
+ let data=localStorage.getItem("user");
+ if(!data){alert("Register first!");return;}
+ let user=JSON.parse(data);
+ if(luser.value.trim()===user.u && lpass.value.trim()===user.p){
+  loginForm.style.display="none";
+  taskPage.style.display="block";
+  welcomeText.innerText="Welcome "+user.u;
+ } else alert("Wrong details");
+};
+
+function showLogin(){registerForm.style.display="none";loginForm.style.display="block";}
+function showRegister(){loginForm.style.display="none";registerForm.style.display="block";}
+
+function countClick(id){if(!clicked[id]){clicked[id]=true;count++;}}
+
+function checkNext(){
+ if(count<3){taskMsg.innerText="Open all 3 channels first!";return;}
+ taskPage.style.display="none";uploadPage.style.display="block";
+}
+
+fileInput.onchange=e=>{
+ let file=e.target.files[0];
+ if(!file||uploads.length>=MAX)return;
+ let r=new FileReader();
+ r.onload=()=>{uploads.push(r.result);preview.innerHTML+=`<img src="${r.result}">`;updateCount()}
+ r.readAsDataURL(file);
+};
+
+function updateCount(){
+ countText.innerText=`Uploaded: ${uploads.length} / 4`;
+ if(uploads.length===4){
+  uploadPage.style.display="none";finalPage.style.display="block";
+  finalMsg.innerHTML="Good luck, <b>"+JSON.parse(localStorage.getItem("user")).u+"</b>!";
+  startTimer();startSparkles();
+ }
+}
+
+// TIMER
+const target=new Date("Feb 26, 2026").getTime();
+function startTimer(){
+ setInterval(()=>{
+  let d=target-new Date().getTime();
+  days.innerText=Math.floor(d/(1000*60*60*24));
+  hours.innerText=Math.floor((d/(1000*60*60))%24);
+  minutes.innerText=Math.floor((d/(1000*60))%60);
+  seconds.innerText=Math.floor((d/1000)%60);
+ },1000);
+}
+
+// SPARKLES
+function startSparkles(){
+ const e=["✨","🎉","⭐","🌟"];
+ for(let i=0;i<70;i++){
+  let s=document.createElement("div");
+  s.className="sparkle";
+  s.innerHTML=e[Math.random()*e.length|0];
+  s.style.left=Math.random()*100+"vw";
+  s.style.animationDuration=(3+Math.random()*4)+"s";
+  document.body.appendChild(s);
+  setTimeout(()=>s.remove(),7000);
+ }
+}
+</script>
+
+</body>
+</html>
