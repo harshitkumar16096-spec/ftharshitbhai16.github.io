@@ -108,13 +108,21 @@ function checkNext(){
  taskPage.style.display="none";uploadPage.style.display="block";
 }
 
-fileInput.onchange=e=>{
- let file=e.target.files[0];
- if(!file||uploads.length>=MAX)return;
- let r=new FileReader();
- r.onload=()=>{uploads.push(r.result);preview.innerHTML+=`<img src="${r.result}">`;updateCount()}
- r.readAsDataURL(file);
-};
+  fileInput.onchange = e => {
+  let files = Array.from(e.target.files);
+
+  files.forEach(file => {
+    if (!file.type.startsWith("image/")) return;
+    if (uploads.length >= MAX) return;
+
+    let reader = new FileReader();
+    reader.onload = () => {
+      uploads.push(reader.result);
+      preview.innerHTML += `<img src="${reader.result}">`;
+      updateCount();
+    };
+    reader.readAsDataURL(file);
+  });
 
 function updateCount(){
  countText.innerText=`Uploaded: ${uploads.length} / 4`;
